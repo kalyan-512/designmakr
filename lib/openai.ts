@@ -42,21 +42,22 @@ export async function generateImage(prompt: string, designType: string): Promise
       }),
     ];
     
-    const request = {
+    const request: any = {
       endpoint,
-      instances,
+      instances: instances.filter(Boolean),
       parameters,
     };
     
     // Make the prediction request
-    const [response] = await predictionServiceClient.predict(request);
+    const response = await predictionServiceClient.predict(request) as any;
+    const result = response[0];
     
-    if (!response.predictions || response.predictions.length === 0) {
+    if (!result.predictions || result.predictions.length === 0) {
       throw new Error("No image generated");
     }
     
     // Extract the image from the response
-    const prediction = response.predictions[0];
+    const prediction = result.predictions[0];
     const imageData = prediction.structValue?.fields?.bytesBase64Encoded?.stringValue;
     
     if (!imageData) {
